@@ -8,7 +8,9 @@
 	},
 	"type": "module",
 	"main": "dist",
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"build": "tsc",
 		"watch": "dum build -- -w",
@@ -16,11 +18,16 @@
 		"lint:dev": "dum lint -- --cache"
 	},
 	"dependencies": {
+		"dotenv": "^16.0.3",
+		"nodemailer": "^6.8.0",
+		"spotify-web-api-node": "^5.0.2"
 	},
 	"devDependencies": {
 		"@cherryblossom/eslint-config": "17.0.0-beta.2",
 		"@types/eslint": "^8.4.10",
 		"@types/node": "^16.18.3",
+		"@types/nodemailer": "^6.4.6",
+		"@types/spotify-web-api-node": "^5.0.7",
 		"@typescript-eslint/eslint-plugin": "^5.42.1",
 		"@typescript-eslint/parser": "^5.42.1",
 		"eslint": "^8.27.0",
