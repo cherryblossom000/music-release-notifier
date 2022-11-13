@@ -15,8 +15,8 @@ RUN pnpm i --offline
 RUN pnpm build
 
 FROM workspace
-ARG port=3000
 COPY --from=workspace /app .
+RUN mkdir /app/data
+VOLUME /app/data
 
-EXPOSE $port
 ENTRYPOINT ["node", "."]
