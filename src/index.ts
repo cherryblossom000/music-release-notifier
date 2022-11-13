@@ -53,6 +53,8 @@ const [lastChecked, subscriptions] = await Promise.all([
 	) as Promise<{email: string; country: string; artists: string[]}[]>
 ])
 
+console.log('Last checked:', new Date(lastChecked))
+
 const newReleases = (
 	await Promise.all(
 		subscriptions.map(
@@ -74,6 +76,12 @@ const newReleases = (
 											}))
 											.filter(a => a.timestamp > lastChecked)
 											.sort((a, b) => a.timestamp - b.timestamp)
+											.map(a => ({
+												name: a.name,
+												url: a.external_urls.spotify,
+												releaseDate: a.release_date,
+												artists: a.artists.map(({id, name}) => ({id, name}))
+											}))
 									] as const
 							)
 						)
@@ -82,6 +90,8 @@ const newReleases = (
 		)
 	)
 ).filter(([, artists]) => artists.length)
+
+console.log(newReleases)
 
 if (newReleases.length) {
 	const emailUser = process.env.EMAIL_USER!
@@ -114,15 +124,13 @@ if (newReleases.length) {
 						)}</a></h2><ul>${albums
 							.map(
 								a =>
-									`<li><em><a href="${a.external_urls.spotify}">${escapeHTML(
-										a.name
-									)}</a></em>${
+									`<li><em><a href="${a.url}">${escapeHTML(a.name)}</a></em>${
 										a.artists.length === 1 && a.artists[0]!.id === artistId
 											? ''
 											: ` by ${a.artists
 													.map(x => escapeHTML(x.name))
 													.join(', ')}`
-									} (${a.release_date})</li>`
+									} (${a.releaseDate})</li>`
 							)
 							.join('')}</ul>`
 					})
@@ -138,3 +146,5 @@ if (newReleases.length) {
 }
 
 await writeFile(lastCheckedFile, String(Date.now()))
+
+console.log('Done')
