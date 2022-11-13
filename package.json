@@ -1,0 +1,38 @@
+{
+	"name": "music-release-notifier",
+	"version": "0.0.1",
+	"author": "cherryblossom (https://github.com/cherryblossom000)",
+	"license": "MIT",
+	"engines": {
+		"node": ">=16"
+	},
+	"type": "module",
+	"main": "dist",
+	"files": ["dist"],
+	"scripts": {
+		"build": "tsc",
+		"watch": "dum build -- -w",
+		"lint": "eslint --max-warnings 0 --ext cjs,ts .",
+		"lint:dev": "dum lint -- --cache"
+	},
+	"dependencies": {
+	},
+	"devDependencies": {
+		"@cherryblossom/eslint-config": "17.0.0-beta.2",
+		"@types/eslint": "^8.4.10",
+		"@types/node": "^16.18.3",
+		"@typescript-eslint/eslint-plugin": "^5.42.1",
+		"@typescript-eslint/parser": "^5.42.1",
+		"eslint": "^8.27.0",
+		"eslint-import-resolver-typescript": "^3.5.2",
+		"eslint-plugin-eslint-comments": "^3.2.0",
+		"eslint-plugin-import": "^2.26.0",
+		"eslint-plugin-jsdoc": "^39.6.2",
+		"eslint-plugin-node": "^11.1.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"eslint-plugin-promise": "^6.1.1",
+		"eslint-plugin-unicorn": "^44.0.2",
+		"prettier": "^2.7.1",
+		"typescript": "~4.8.4"
+	}
+}
