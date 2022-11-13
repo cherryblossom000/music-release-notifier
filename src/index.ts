@@ -1,43 +1,140 @@
-import {readFile} from 'node:fs/promises'
+import {readFile, writeFile} from 'node:fs/promises'
+import escapeHTML from 'escape-html'
 import * as nodemailer from 'nodemailer'
 import SpotifyWebAPI from 'spotify-web-api-node'
 import 'dotenv/config'
-import type SMTPTransport from 'nodemailer/lib/smtp-transport'
-
-const dev = process.env.NODE_ENV !== 'production'
-
-let transporterOptions: SMTPTransport.Options & {auth: {user: string}}
-
-if (dev) {
-	const {smtp, user, pass} = await nodemailer.createTestAccount()
-	transporterOptions = {
-		host: smtp.host,
-		port: smtp.port,
-		secure: smtp.secure,
-		auth: {user, pass}
-	}
-} else {
-	transporterOptions = {
-		host: process.env.SMTP_HOST,
-		port: Number(process.env.SMTP_PORT),
-		secure: true,
-		auth: {user: process.env.EMAIL_USER!, pass: process.env.EMAIL_PASS}
-	}
-}
-
-const transporter = nodemailer.createTransport(transporterOptions, {
-	from: `New Music Releases ${transporterOptions.auth.user}`
-})
-await transporter.verify()
 
 const spotify = new SpotifyWebAPI({
 	clientId: process.env.SPOTIFY_CLIENT_ID,
 	clientSecret: process.env.SPOTIFY_CLIENT_SECRET
 })
 
-const lastChecked = Number(
-	await readFile(new URL('last-checked', import.meta.url), 'utf8')
+spotify.setAccessToken(
+	(await spotify.clientCredentialsGrant()).body.access_token
 )
 
-const info = await transporter.sendMail({to: '', subject: '', text: ''})
-if (dev) console.log(nodemailer.getTestMessageUrl(info))
+const limit = 50
+const getAllAlbums = async (
+	artistId: string,
+	country: string
+): Promise<SpotifyApi.AlbumObjectSimplified[]> => {
+	const {
+		body: {total, items}
+	} = await spotify.getArtistAlbums(artistId, {country, limit})
+	return total > items.length
+		? // eslint-disable-next-line unicorn/prefer-spread -- avoids .flat()
+		  items.concat(
+				...(await Promise.all(
+					Array.from(
+						{length: Math.ceil((total - items.length) / 50)},
+						async (_, i) =>
+							(
+								await spotify.getArtistAlbums(artistId, {
+									country,
+									limit,
+									offset: 50 * (i + 1)
+								})
+							).body.items
+					)
+				))
+		  )
+		: items
+}
+
+const dataFolder = new URL('../data/', import.meta.url)
+const lastCheckedFile = new URL('last-checked', dataFolder)
+
+const [lastChecked, subscriptions] = await Promise.all([
+	/* eslint-disable unicorn/prefer-top-level-await -- Promise.all */
+	readFile(lastCheckedFile, 'utf8').then(Number),
+	readFile(new URL('subscriptions.json', dataFolder), 'utf8').then(
+		/* eslint-enable unicorn/prefer-top-level-await */
+		JSON.parse
+	) as Promise<{email: string; country: string; artists: string[]}[]>
+])
+
+const newReleases = (
+	await Promise.all(
+		subscriptions.map(
+			async ({email, country, artists: subscribedArtists}) =>
+				[
+					email,
+					(
+						await Promise.all(
+							subscribedArtists.map(
+								async artistId =>
+									[
+										artistId,
+										(
+											await getAllAlbums(artistId, country)
+										)
+											.map(album => ({
+												...album,
+												timestamp: new Date(album.release_date).getTime()
+											}))
+											.filter(a => a.timestamp > lastChecked)
+											.sort((a, b) => a.timestamp - b.timestamp)
+									] as const
+							)
+						)
+					).filter(([, albums]) => albums.length)
+				] as const
+		)
+	)
+).filter(([, artists]) => artists.length)
+
+if (newReleases.length) {
+	const emailUser = process.env.EMAIL_USER!
+	const transporter = nodemailer.createTransport(
+		{
+			host: process.env.SMTP_HOST,
+			port: Number(process.env.SMTP_PORT),
+			secure: true,
+			auth: {user: emailUser, pass: process.env.EMAIL_PASS}
+		},
+		{
+			from: `New Music Releases <${emailUser}>`
+		}
+	)
+	await transporter.verify()
+
+	await Promise.all(
+		newReleases.map(async ([email, artists]) => {
+			const html = (
+				await Promise.all(
+					artists.map(async ([artistId, albums]) => {
+						const {
+							body: {
+								name: artistName,
+								external_urls: {spotify: artistURL}
+							}
+						} = await spotify.getArtist(artistId)
+						return `<h2><a href="${artistURL}">${escapeHTML(
+							artistName
+						)}</a></h2><ul>${albums
+							.map(
+								a =>
+									`<li><em><a href="${a.external_urls.spotify}">${escapeHTML(
+										a.name
+									)}</a></em>${
+										a.artists.length === 1 && a.artists[0]!.id === artistId
+											? ''
+											: ` by ${a.artists
+													.map(x => escapeHTML(x.name))
+													.join(', ')}`
+									} (${a.release_date})</li>`
+							)
+							.join('')}</ul>`
+					})
+				)
+			).join('')
+			await transporter.sendMail({
+				to: `<${email}>`,
+				subject: 'New Music Releases',
+				html
+			})
+		})
+	)
+}
+
+await writeFile(lastCheckedFile, String(Date.now()))

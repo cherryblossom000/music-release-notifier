@@ -17,8 +17,8 @@
 		"importsNotUsedAsValues": "error",
 		"noImplicitOverride": true,
 		"noUncheckedIndexedAccess": true,
-		// "noUnusedLocals": true,
-		// "noUnusedParameters": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
 		"useDefineForClassFields": true,
 		"useUnknownInCatchVariables": true,
 		"strict": true

@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@cherryblossom/eslint-config': 17.0.0-beta.2
+  '@types/escape-html': ^1.0.2
   '@types/eslint': ^8.4.10
   '@types/node': ^16.18.3
   '@types/nodemailer': ^6.4.6
@@ -9,6 +10,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.42.1
   '@typescript-eslint/parser': ^5.42.1
   dotenv: ^16.0.3
+  escape-html: ^1.0.3
   eslint: ^8.27.0
   eslint-import-resolver-typescript: ^3.5.2
   eslint-plugin-eslint-comments: ^3.2.0
@@ -25,11 +27,13 @@ specifiers:
 
 dependencies:
   dotenv: 16.0.3
+  escape-html: 1.0.3
   nodemailer: 6.8.0
   spotify-web-api-node: 5.0.2
 
 devDependencies:
   '@cherryblossom/eslint-config': 17.0.0-beta.2_phxnzfok24xgm4jeecwaaryenq
+  '@types/escape-html': 1.0.2
   '@types/eslint': 8.4.10
   '@types/node': 16.18.3
   '@types/nodemailer': 6.4.6
@@ -198,6 +202,10 @@ packages:
       picocolors: 1.0.0
       tiny-glob: 0.2.9
       tslib: 2.4.1
+    dev: true
+
+  /@types/escape-html/1.0.2:
+    resolution: {integrity: sha512-gaBLT8pdcexFztLSPRtriHeXY/Kn4907uOCZ4Q3lncFBkheAWOuNt53ypsF8szgxbEJ513UeBzcf4utN0EzEwA==}
     dev: true
 
   /@types/eslint/8.4.10:
@@ -707,6 +715,10 @@ packages:
       is-date-object: 1.0.5
       is-symbol: 1.0.4
     dev: true
+
+  /escape-html/1.0.3:
+    resolution: {integrity: sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==}
+    dev: false
 
   /escape-string-regexp/1.0.5:
     resolution: {integrity: sha512-vbRorB5FUQWvla16U8R/qgaFIya2qGzwDrNmCZuYKrbdSUMG6I1ZCGQRefkRVhuOkIGVne7BQ35DSfo1qvJqFg==}
