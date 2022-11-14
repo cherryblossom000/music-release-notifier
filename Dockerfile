@@ -16,7 +16,8 @@ RUN pnpm build
 
 FROM workspace
 COPY --from=workspace /app .
+
 RUN mkdir /app/data
 VOLUME /app/data
 
-ENTRYPOINT ["node", "."]
+ENTRYPOINT echo "$(tr -d '\n' < /app/data/schedule) cd /app && node . > /proc/1/fd/1 2> /proc/1/fd/2" > /etc/crontabs/root && crond -fd 8
