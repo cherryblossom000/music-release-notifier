@@ -1,4 +1,5 @@
 import {readFile, writeFile} from 'node:fs/promises'
+import {inspect} from 'node:util'
 import escapeHTML from 'escape-html'
 import * as nodemailer from 'nodemailer'
 import SpotifyWebAPI from 'spotify-web-api-node'
@@ -102,7 +103,7 @@ else {
 		)
 	).filter(([, artists]) => artists.length)
 
-	console.log(newReleases)
+	console.log(inspect(newReleases, false, null, true))
 
 	if (newReleases.length) {
 		const emailUser = process.env.EMAIL_USER!
