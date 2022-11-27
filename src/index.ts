@@ -12,6 +12,9 @@ const wait = async (ms: number): Promise<void> =>
 		setTimeout(resolve, ms)
 	})
 
+const isSoundtrack = (name: string): boolean =>
+	name.includes('soundtrack') || name.includes('motion picture')
+
 const dataFolder = new URL('../data/', import.meta.url)
 const lastCheckedFile = new URL('last-checked', dataFolder)
 
@@ -139,7 +142,16 @@ else {
 													...album,
 													timestamp: new Date(album.release_date).getTime()
 												}))
-												.filter(a => a.timestamp > lastChecked!)
+												.filter(
+													a =>
+														a.timestamp > lastChecked! &&
+														!(
+															a.album_group === 'appears_on' &&
+															a.artists.length === 1 &&
+															a.artists[0]!.id === '0LyfQWJT6nXafLPZqxe9Of' &&
+															!isSoundtrack(a.name.toLowerCase())
+														)
+												)
 												.sort((a, b) => a.timestamp - b.timestamp)
 												.map(a => ({
 													name: a.name,
