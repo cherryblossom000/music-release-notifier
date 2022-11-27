@@ -3,14 +3,8 @@ import {inspect} from 'node:util'
 import escapeHTML from 'escape-html'
 import * as nodemailer from 'nodemailer'
 import * as yaml from 'js-yaml'
-import SpotifyWebAPI from 'spotify-web-api-node'
-import {WebapiError} from 'spotify-web-api-node/src/response-error.js'
+import * as Spotify from './spotify.js'
 import 'dotenv/config'
-
-const wait = async (ms: number): Promise<void> =>
-	new Promise(resolve => {
-		setTimeout(resolve, ms)
-	})
 
 const isSoundtrack = (name: string): boolean =>
 	name.includes('soundtrack') || name.includes('motion picture')
@@ -40,67 +34,21 @@ else {
 		await readFile(new URL('subscriptions.yaml', dataFolder), 'utf8')
 	)) as {email: string; country: string; artists: string[]}[]
 
-	const spotify = new SpotifyWebAPI({
-		clientId: process.env.SPOTIFY_CLIENT_ID,
-		clientSecret: process.env.SPOTIFY_CLIENT_SECRET
-	})
-
-	spotify.setAccessToken(
-		(await spotify.clientCredentialsGrant()).body.access_token
+	const spotify = await Spotify.clientCredentialsClient(
+		process.env.SPOTIFY_CLIENT_ID!,
+		process.env.SPOTIFY_CLIENT_SECRET!
 	)
-
-	const retry = async <T>(fn: () => Promise<T>): Promise<T> => {
-		const go = async (retries: number): Promise<T> => {
-			try {
-				return await fn()
-			} catch (error) {
-				console.error(error)
-				const newRetries = retries - 1
-				if (!newRetries) throw error
-				const delay = 2 ** newRetries * 100
-				console.log(`${newRetries} retries left, waiting ${delay} ms`)
-				await wait(delay)
-				return go(newRetries)
-			}
-		}
-		return go(5)
-	}
-
-	// TODO: export this type in DT
-	interface Response<T> {
-		body: T
-		headers: Record<string, string>
-		statusCode: number
-	}
-	const requestSpotify = async <T>(
-		fn: () => Promise<Response<T>>
-	): Promise<T> =>
-		retry(async () => {
-			const handleRateLimit = async (): Promise<T> => {
-				let response: Response<T>
-				try {
-					response = await fn()
-				} catch (error) {
-					if (!(error instanceof WebapiError) || error.statusCode !== 429)
-						throw error
-					const retryAfter = Number(error.headers['retry-after'])
-					console.log('rate limited, retrying after', retryAfter, 'seconds')
-					await wait(retryAfter * 1000)
-					return handleRateLimit()
-				}
-				return response.body
-			}
-			return handleRateLimit()
-		})
 
 	const limit = 50
 	const getAllAlbums = async (
 		artistId: string,
-		country: string
-	): Promise<SpotifyApi.AlbumObjectSimplified[]> => {
-		const {total, items} = await requestSpotify(async () =>
-			spotify.getArtistAlbums(artistId, {country, limit})
-		)
+		market: string
+	): Promise<Spotify.Album[]> => {
+		const {total, items} = await spotify.getArtistAlbums(artistId, {
+			market,
+			limit
+		})
+
 		return total > items.length
 			? // eslint-disable-next-line unicorn/prefer-spread -- avoids .flat()
 			  items.concat(
@@ -109,13 +57,11 @@ else {
 							{length: Math.ceil((total - items.length) / 50)},
 							async (_, i) =>
 								(
-									await requestSpotify(async () =>
-										spotify.getArtistAlbums(artistId, {
-											country,
-											limit,
-											offset: 50 * (i + 1)
-										})
-									)
+									await spotify.getArtistAlbums(artistId, {
+										market,
+										limit,
+										offset: 50 * (i + 1)
+									})
 								).items
 						)
 					))
@@ -193,7 +139,7 @@ else {
 							const {
 								name: artistName,
 								external_urls: {spotify: artistURL}
-							} = await requestSpotify(async () => spotify.getArtist(artistId))
+							} = await spotify.getArtist(artistId)
 							return `<h2><a href="${artistURL}">${escapeHTML(
 								artistName
 							)}</a></h2><ul>${albums
