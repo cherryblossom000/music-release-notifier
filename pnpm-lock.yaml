@@ -4,6 +4,7 @@ specifiers:
   '@cherryblossom/eslint-config': 17.0.0-beta.3
   '@types/escape-html': ^1.0.2
   '@types/eslint': ^8.4.10
+  '@types/js-yaml': ^4.0.5
   '@types/node': ^16.18.3
   '@types/nodemailer': ^6.4.6
   '@types/spotify-web-api-node': ^5.0.7
@@ -20,6 +21,7 @@ specifiers:
   eslint-plugin-prettier: ^4.2.1
   eslint-plugin-promise: ^6.1.1
   eslint-plugin-unicorn: ^45.0.0
+  js-yaml: ^4.1.0
   nodemailer: ^6.8.0
   prettier: ^2.8.0
   spotify-web-api-node: ^5.0.2
@@ -28,6 +30,7 @@ specifiers:
 dependencies:
   dotenv: 16.0.3
   escape-html: 1.0.3
+  js-yaml: 4.1.0
   nodemailer: 6.8.0
   spotify-web-api-node: 5.0.2
 
@@ -35,6 +38,7 @@ devDependencies:
   '@cherryblossom/eslint-config': 17.0.0-beta.3_hxwlm5sfoamxz6sc6pknmebdzi
   '@types/escape-html': 1.0.2
   '@types/eslint': 8.4.10
+  '@types/js-yaml': 4.0.5
   '@types/node': 16.18.3
   '@types/nodemailer': 6.4.6
   '@types/spotify-web-api-node': 5.0.7
@@ -217,6 +221,10 @@ packages:
 
   /@types/estree/1.0.0:
     resolution: {integrity: sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==}
+    dev: true
+
+  /@types/js-yaml/4.0.5:
+    resolution: {integrity: sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==}
     dev: true
 
   /@types/json-schema/7.0.11:
@@ -428,7 +436,6 @@ packages:
 
   /argparse/2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
-    dev: true
 
   /array-includes/3.1.6:
     resolution: {integrity: sha512-sgTbLvL6cNnw24FnbaDyjmvddQ2ML8arZsgaJhoABMoplz/4QRhtrYS+alr1BUM1Bwp6dhx8vVCBSLG+StwOFw==}
@@ -1488,7 +1495,6 @@ packages:
     hasBin: true
     dependencies:
       argparse: 2.0.1
-    dev: true
 
   /jsdoc-type-pratt-parser/3.1.0:
     resolution: {integrity: sha512-MgtD0ZiCDk9B+eI73BextfRrVQl0oyzRG8B2BjORts6jbunj4ScKPcyXGTbB6eXL4y9TzxCm6hyeLq/2ASzNdw==}

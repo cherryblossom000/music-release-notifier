@@ -2,6 +2,7 @@ import {readFile, writeFile} from 'node:fs/promises'
 import {inspect} from 'node:util'
 import escapeHTML from 'escape-html'
 import * as nodemailer from 'nodemailer'
+import * as yaml from 'js-yaml'
 import SpotifyWebAPI from 'spotify-web-api-node'
 import 'dotenv/config'
 
@@ -26,8 +27,8 @@ if (lastChecked === undefined) console.log('Running for the first time')
 else {
 	console.log('Last checked:', new Date(lastChecked))
 
-	const subscriptions = (await JSON.parse(
-		await readFile(new URL('subscriptions.json', dataFolder), 'utf8')
+	const subscriptions = (await yaml.load(
+		await readFile(new URL('subscriptions.yaml', dataFolder), 'utf8')
 	)) as {email: string; country: string; artists: string[]}[]
 
 	const spotify = new SpotifyWebAPI({
