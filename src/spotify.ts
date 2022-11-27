@@ -82,15 +82,16 @@ export const clientCredentialsClient = async (
 		.then(async r => r.json())
 		.then(b => (b as {access_token: string}).access_token)
 
-	let retryLock: [Promise<void>, number] | undefined
+	type Lock = [promise: Promise<void>, timestamp: number]
+	let retryLock: Lock | undefined
 	const request = async <T>(message: string, path: string): Promise<T> =>
 		retry(async () => {
 			const handleRateLimit = async (): Promise<T> => {
 				while (retryLock) {
 					// eslint-disable-next-line no-await-in-loop -- waiting for rate limit
 					await retryLock[0]
-					// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- async, could have been modified
-					if (Date.now() >= (retryLock?.[1] ?? 0)) retryLock = undefined
+					if (Date.now() >= ((retryLock as Lock | undefined)?.[1] ?? 0))
+						retryLock = undefined
 				}
 				const response = await fetch(
 					message,
@@ -105,8 +106,7 @@ export const clientCredentialsClient = async (
 					const retryAfterMs = retryAfter * 1000
 					const timestamp =
 						new Date(response.headers.get('date')!).getTime() + retryAfterMs
-					// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- async, could have been modified
-					if (timestamp > (retryLock?.[1] ?? 0))
+					if (timestamp > ((retryLock as Lock | undefined)?.[1] ?? 0))
 						retryLock = [wait(retryAfterMs), timestamp]
 					return handleRateLimit()
 				}
