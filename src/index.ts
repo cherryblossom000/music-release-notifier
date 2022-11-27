@@ -9,8 +9,8 @@ import 'dotenv/config'
 const isSoundtrack = (name: string): boolean =>
 	name.includes('soundtrack') || name.includes('motion picture')
 
-const dataFolder = new URL('../data/', import.meta.url)
-const lastCheckedFile = new URL('last-checked', dataFolder)
+const configFolder = new URL('../config/', import.meta.url)
+const lastCheckedFile = new URL('last-checked', configFolder)
 
 let lastChecked: number | undefined
 try {
@@ -31,7 +31,7 @@ else {
 	console.log('Last checked:', new Date(lastChecked))
 
 	const subscriptions = (await yaml.load(
-		await readFile(new URL('subscriptions.yaml', dataFolder), 'utf8')
+		await readFile(new URL('subscriptions.yaml', configFolder), 'utf8')
 	)) as {email: string; country: string; artists: string[]}[]
 
 	const spotify = await Spotify.clientCredentialsClient(

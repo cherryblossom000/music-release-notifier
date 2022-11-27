@@ -3,7 +3,7 @@ build:
 alias b := build
 
 run *args:
-	docker run -v "$(realpath data)":/app/data {{args}} music-release-notifier
+	docker run -v "$(realpath config)":/app/config {{args}} music-release-notifier
 alias r := run
 
 run-detach: (run "-d")
