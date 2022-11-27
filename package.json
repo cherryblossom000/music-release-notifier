@@ -24,24 +24,24 @@
 		"spotify-web-api-node": "^5.0.2"
 	},
 	"devDependencies": {
-		"@cherryblossom/eslint-config": "17.0.0-beta.2",
+		"@cherryblossom/eslint-config": "17.0.0-beta.3",
 		"@types/escape-html": "^1.0.2",
 		"@types/eslint": "^8.4.10",
 		"@types/node": "^16.18.3",
 		"@types/nodemailer": "^6.4.6",
 		"@types/spotify-web-api-node": "^5.0.7",
-		"@typescript-eslint/eslint-plugin": "^5.42.1",
-		"@typescript-eslint/parser": "^5.42.1",
-		"eslint": "^8.27.0",
+		"@typescript-eslint/eslint-plugin": "^5.44.0",
+		"@typescript-eslint/parser": "^5.44.0",
+		"eslint": "^8.28.0",
 		"eslint-import-resolver-typescript": "^3.5.2",
 		"eslint-plugin-eslint-comments": "^3.2.0",
 		"eslint-plugin-import": "^2.26.0",
-		"eslint-plugin-jsdoc": "^39.6.2",
+		"eslint-plugin-jsdoc": "^39.6.4",
 		"eslint-plugin-node": "^11.1.0",
 		"eslint-plugin-prettier": "^4.2.1",
 		"eslint-plugin-promise": "^6.1.1",
-		"eslint-plugin-unicorn": "^44.0.2",
-		"prettier": "^2.7.1",
-		"typescript": "~4.8.4"
+		"eslint-plugin-unicorn": "^45.0.0",
+		"prettier": "^2.8.0",
+		"typescript": "~4.9.3"
 	}
 }
