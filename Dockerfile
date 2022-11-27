@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:16-alpine AS workspace
+FROM node:18-alpine AS workspace
 WORKDIR /app
 
 RUN apk --no-cache add curl
