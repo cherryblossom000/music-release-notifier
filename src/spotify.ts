@@ -6,20 +6,19 @@ const wait = async (ms: number): Promise<void> =>
 	})
 
 const retry = async <T>(fn: () => Promise<T>): Promise<T> => {
-	const go = async (retries: number): Promise<T> => {
+	const go = async (retries: number, delay: number): Promise<T> => {
 		try {
 			return await fn()
 		} catch (error) {
 			console.error(error)
 			const newRetries = retries - 1
 			if (!newRetries) throw error
-			const delay = 2 ** newRetries * 100
 			console.log(`${newRetries} retries left, waiting ${delay} ms`)
 			await wait(delay)
-			return go(newRetries)
+			return go(newRetries, delay * 2)
 		}
 	}
-	return go(5)
+	return go(5, 3000)
 }
 
 const fetch = async (
