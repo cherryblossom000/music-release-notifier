@@ -21,14 +21,20 @@ module.exports = {
 				project: 'tsconfig.json',
 				tsconfigRootDir: __dirname
 			},
-			settings: {'import/resolver': {typescript: {project: 'tsconfig.json'}}},
+			settings: {
+				'import/resolver': {typescript: {project: 'tsconfig.json'}}
+			},
 			rules: {
 				'@typescript-eslint/naming-convention': 0
 			}
 		},
 		{
 			files: 'src/index.ts',
-			rules: {'import/no-unused-modules': 0}
+			rules: {
+				'import/no-unused-modules': 0,
+				'node/no-process-exit': 0,
+				'node/shebang': 0
+			}
 		}
 	]
 }

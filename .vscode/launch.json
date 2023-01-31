@@ -6,7 +6,8 @@
 			"request": "launch",
 			"name": "Launch",
 			"program": "${workspaceRoot}/dist/index.js",
-			"outFiles": ["${workspaceFolder}/dist/**/*.js"]
+			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
+			"args": ["config"]
 		}
 	]
 }

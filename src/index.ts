@@ -1,20 +1,42 @@
+#!/usr/bin/env node
+
 import {readFile, writeFile} from 'node:fs/promises'
+import * as path from 'node:path'
 import {inspect} from 'node:util'
 import escapeHTML from 'escape-html'
 import * as nodemailer from 'nodemailer'
 import * as yaml from 'js-yaml'
+import {z} from 'zod'
 import * as Spotify from './spotify.js'
 import 'dotenv/config'
 
+const variousArtistsIds: ReadonlySet<string> = new Set([
+	'0LyfQWJT6nXafLPZqxe9Of', // Various Artists
+	'0wzdbYD0TtDPvbjQ5QT7nY' // ァリアス・アーティスト
+])
 const isSoundtrack = (name: string): boolean =>
 	name.includes('soundtrack') || name.includes('motion picture')
 
-const configFolder = new URL('../config/', import.meta.url)
-const lastCheckedFile = new URL('last-checked', configFolder)
+const HELP_TEXT = `Usage: ./music-release-notifier <config-folder>
 
-let lastChecked: number | undefined
+config-folder is the path to a folder containing a \`subscriptions.yaml\` file.
+This file should have these properties:
+- \`email\`: The email to send the new releases to
+- \`artists\`: A list of Spotify artist ids
+- \`country\` (optional, defaults to \`AU\`): The Spotify market`
+
+const args = process.argv.slice(2)
+if (args.length !== 1) {
+	console.error(HELP_TEXT)
+	process.exit(1)
+}
+
+const configFolder = args[0]!
+const lastCheckedFile = path.join(configFolder, 'last-checked')
+
+let lastCheckedString: string | undefined
 try {
-	lastChecked = Number(await readFile(lastCheckedFile, 'utf8'))
+	lastCheckedString = await readFile(lastCheckedFile, 'utf8')
 } catch (error) {
 	if (
 		!(
@@ -25,14 +47,30 @@ try {
 	)
 		throw error
 }
+const lastChecked =
+	lastCheckedString === undefined
+		? undefined
+		: z.number().parse(Number(lastCheckedString))
 
 if (lastChecked === undefined) console.log('Running for the first time')
 else {
 	console.log('Last checked:', new Date(lastChecked))
 
-	const subscriptions = (await yaml.load(
-		await readFile(new URL('subscriptions.yaml', configFolder), 'utf8')
-	)) as {email: string; country: string; artists: string[]}[]
+	const {
+		email,
+		country = 'AU',
+		artists: subscribedArtists
+	} = z
+		.object({
+			email: z.string(),
+			country: z.string().optional(),
+			artists: z.array(z.string().length(22))
+		})
+		.parse(
+			await yaml.load(
+				await readFile(path.join(configFolder, 'subscriptions.yaml'), 'utf8')
+			)
+		)
 
 	const spotify = await Spotify.clientCredentialsClient(
 		process.env.SPOTIFY_CLIENT_ID!,
@@ -71,48 +109,35 @@ else {
 
 	const newReleases = (
 		await Promise.all(
-			subscriptions.map(
-				async ({email, country, artists: subscribedArtists}) =>
-					[
-						email,
-						(
-							await Promise.all(
-								subscribedArtists.map(
-									async artistId =>
-										[
-											artistId,
-											(
-												await getAllAlbums(artistId, country)
-											)
-												.map(album => ({
-													...album,
-													timestamp: new Date(album.release_date).getTime()
-												}))
-												.filter(
-													a =>
-														a.timestamp > lastChecked! &&
-														!(
-															a.album_group === 'appears_on' &&
-															a.artists.length === 1 &&
-															a.artists[0]!.id === '0LyfQWJT6nXafLPZqxe9Of' &&
-															!isSoundtrack(a.name.toLowerCase())
-														)
-												)
-												.sort((a, b) => a.timestamp - b.timestamp)
-												.map(a => ({
-													name: a.name,
-													url: a.external_urls.spotify,
-													releaseDate: a.release_date,
-													artists: a.artists.map(({id, name}) => ({id, name}))
-												}))
-										] as const
-								)
+			subscribedArtists.map(async artistId => ({
+				id: artistId,
+				albums: (
+					await getAllAlbums(artistId, country)
+				)
+					.map(album => ({
+						...album,
+						timestamp: new Date(album.release_date).getTime()
+					}))
+					.filter(
+						a =>
+							a.timestamp > lastChecked &&
+							!(
+								a.album_group === 'appears_on' &&
+								a.artists.length === 1 &&
+								variousArtistsIds.has(a.artists[0]!.id) &&
+								!isSoundtrack(a.name.toLowerCase())
 							)
-						).filter(([, albums]) => albums.length)
-					] as const
-			)
+					)
+					.sort((a, b) => a.timestamp - b.timestamp)
+					.map(a => ({
+						name: a.name,
+						url: a.external_urls.spotify,
+						releaseDate: a.release_date,
+						artists: a.artists.map(({id, name}) => ({id, name}))
+					}))
+			}))
 		)
-	).filter(([, artists]) => artists.length)
+	).filter(({albums}) => albums.length)
 
 	console.log(inspect(newReleases, false, null, true))
 
@@ -131,39 +156,33 @@ else {
 		)
 		await transporter.verify()
 
-		await Promise.all(
-			newReleases.map(async ([email, artists]) => {
-				const html = (
-					await Promise.all(
-						artists.map(async ([artistId, albums]) => {
-							const {
-								name: artistName,
-								external_urls: {spotify: artistURL}
-							} = await spotify.getArtist(artistId)
-							return `<h2><a href="${artistURL}">${escapeHTML(
-								artistName
-							)}</a></h2><ul>${albums
-								.map(
-									a =>
-										`<li><em><a href="${a.url}">${escapeHTML(a.name)}</a></em>${
-											a.artists.length === 1 && a.artists[0]!.id === artistId
-												? ''
-												: ` by ${a.artists
-														.map(x => escapeHTML(x.name))
-														.join(', ')}`
-										} (${a.releaseDate})</li>`
-								)
-								.join('')}</ul>`
-						})
-					)
-				).join('')
-				await transporter.sendMail({
-					to: `<${email}>`,
-					subject: 'New Music Releases',
-					html
+		const html = (
+			await Promise.all(
+				newReleases.map(async ({id: artistId, albums}) => {
+					const {
+						name: artistName,
+						external_urls: {spotify: artistURL}
+					} = await spotify.getArtist(artistId)
+					return `<h2><a href="${artistURL}">${escapeHTML(
+						artistName
+					)}</a></h2><ul>${albums
+						.map(
+							a =>
+								`<li><em><a href="${a.url}">${escapeHTML(a.name)}</a></em>${
+									a.artists.length === 1 && a.artists[0]!.id === artistId
+										? ''
+										: ` by ${a.artists.map(x => escapeHTML(x.name)).join(', ')}`
+								} (${a.releaseDate})</li>`
+						)
+						.join('')}</ul>`
 				})
-			})
-		)
+			)
+		).join('')
+		await transporter.sendMail({
+			to: `<${email}>`,
+			subject: 'New Music Releases',
+			html
+		})
 	}
 }
 

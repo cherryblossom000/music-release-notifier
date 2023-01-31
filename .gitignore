@@ -4,3 +4,4 @@ node_modules/
 *.tsbuildinfo
 /config/
 /dist/
+/bundle/

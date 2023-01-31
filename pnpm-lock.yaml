@@ -26,6 +26,7 @@ specifiers:
   prettier: ^2.8.3
   typescript: ~4.9.5
   undici: ^5.16.0
+  zod: ^3.20.2
 
 dependencies:
   dotenv: 16.0.3
@@ -33,6 +34,7 @@ dependencies:
   js-yaml: 4.1.0
   nodemailer: 6.9.1
   undici: 5.16.0
+  zod: 3.20.2
 
 devDependencies:
   '@cherryblossom/eslint-config': 17.0.0_sr7rgot62qghv5ld74g7aqaosy
@@ -2463,3 +2465,7 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zod/3.20.2:
+    resolution: {integrity: sha512-1MzNQdAvO+54H+EaK5YpyEy0T+Ejo/7YLHS93G3RnYWh5gaotGHwGeN/ZO687qEDU2y4CdStQYXVHIgrUl5UVQ==}
+    dev: false

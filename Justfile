@@ -1,20 +1,10 @@
-tag := "music-release-notifier"
-
 build:
-	docker build . -t {{tag}}
+	dum build
 alias b := build
 
-run *args:
-	docker run -v "$(realpath config)":/app/config {{args}} {{tag}}
-alias r := run
+out := "bundle/music-release-notifier.js"
 
-run-detach: (run "-d")
-alias rd := run-detach
-
-export: build
-	docker save {{tag}} | gzip > {{tag}}.tar.gz
-
-bundle:
+bundle: build
 	mkdir -p bundle
 	dum esbuild \
 		--bundle \
@@ -22,6 +12,8 @@ bundle:
 		--platform=node \
 		--format=esm \
 		--target=node18,es2022 \
-		--outfile=bundle/index.js \
+		--outfile={{out}} \
 		--banner:js="'import{createRequire}from\"node:module\";const require=createRequire(import.meta.url)'" \
 		src/index.ts
+	chmod +x {{out}}
+alias n := bundle
