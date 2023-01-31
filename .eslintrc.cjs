@@ -21,6 +21,7 @@ module.exports = {
 				project: 'tsconfig.json',
 				tsconfigRootDir: __dirname
 			},
+			settings: {'import/resolver': {typescript: {project: 'tsconfig.json'}}},
 			rules: {
 				'@typescript-eslint/naming-convention': 0
 			}
