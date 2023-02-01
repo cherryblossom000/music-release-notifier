@@ -2,7 +2,7 @@ build:
 	dum build
 alias b := build
 
-out := "bundle/music-release-notifier.js"
+out := "bundle/music-release-notifier.mjs"
 
 bundle: build
 	mkdir -p bundle
