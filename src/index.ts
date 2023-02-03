@@ -52,6 +52,8 @@ const lastChecked =
 		? undefined
 		: z.number().parse(Number(lastCheckedString))
 
+const now = Date.now()
+
 if (lastChecked === undefined) console.log('Running for the first time')
 else {
 	console.log('Last checked:', new Date(lastChecked))
@@ -186,6 +188,6 @@ else {
 	}
 }
 
-await writeFile(lastCheckedFile, String(Date.now()))
+await writeFile(lastCheckedFile, String(now))
 
 console.log('Done')
