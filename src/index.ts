@@ -54,6 +54,8 @@ const lastChecked =
 
 const now = Date.now()
 
+console.log('timezone offset:', new Date('2023').getTimezoneOffset())
+
 if (lastChecked === undefined) console.log('Running for the first time')
 else {
 	console.log('Last checked:', new Date(lastChecked))
@@ -116,10 +118,14 @@ else {
 				albums: (
 					await getAllAlbums(artistId, country)
 				)
-					.map(album => ({
-						...album,
-						timestamp: new Date(album.release_date).getTime()
-					}))
+					.map(album => {
+						const date = new Date(album.release_date)
+						date.setMinutes(date.getMinutes() + date.getTimezoneOffset())
+						return {
+							...album,
+							timestamp: date.getTime()
+						}
+					})
 					.filter(
 						a =>
 							a.timestamp > lastChecked &&
