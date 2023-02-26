@@ -17,3 +17,8 @@ bundle: build
 		src/index.ts
 	chmod +x {{out}}
 alias n := bundle
+
+deploy: bundle
+	osascript -e 'mount volume "smb://lauren@DS920/home"'
+	cp {{out}} '/Volumes/home/Music Release Notifier/music-release-notifier.mjs'
+alias d := deploy

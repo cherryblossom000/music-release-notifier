@@ -52,9 +52,15 @@ const lastChecked =
 		? undefined
 		: z.number().parse(Number(lastCheckedString))
 
-const now = Date.now()
-
-console.log('timezone offset:', new Date('2023').getTimezoneOffset())
+const newLastCheckedDate = new Date()
+console.log('Now:', newLastCheckedDate)
+const timezoneOffset = new Date('2023').getTimezoneOffset()
+console.log('Timezone offset:', timezoneOffset)
+newLastCheckedDate.setMinutes(
+	newLastCheckedDate.getMinutes() + timezoneOffset - 12 * 60
+)
+console.log('New last checked:', newLastCheckedDate)
+const newLastChecked = newLastCheckedDate.getTime()
 
 if (lastChecked === undefined) console.log('Running for the first time')
 else {
@@ -118,17 +124,14 @@ else {
 				albums: (
 					await getAllAlbums(artistId, country)
 				)
-					.map(album => {
-						const date = new Date(album.release_date)
-						date.setMinutes(date.getMinutes() + date.getTimezoneOffset())
-						return {
-							...album,
-							timestamp: date.getTime()
-						}
-					})
+					.map(album => ({
+						...album,
+						timestamp: new Date(album.release_date).getTime()
+					}))
 					.filter(
 						a =>
 							a.timestamp > lastChecked &&
+							a.timestamp < newLastChecked &&
 							!(
 								a.album_group === 'appears_on' &&
 								a.artists.length === 1 &&
@@ -194,6 +197,6 @@ else {
 	}
 }
 
-await writeFile(lastCheckedFile, String(now))
+await writeFile(lastCheckedFile, String(newLastChecked))
 
 console.log('Done')
