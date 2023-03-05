@@ -1,3 +1,5 @@
+default: deploy
+
 build:
 	dum build
 alias b := build
