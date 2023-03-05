@@ -126,7 +126,8 @@ else {
 				)
 					.map(album => ({
 						...album,
-						timestamp: new Date(album.release_date).getTime()
+						timestamp:
+							new Date(album.release_date).getTime() + timezoneOffset * 60_000
 					}))
 					.filter(
 						a =>

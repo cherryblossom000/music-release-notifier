@@ -101,7 +101,7 @@ export const clientCredentialsClient = async (
 				)
 				if (response.status === 429) {
 					const retryAfter = Number(response.headers.get('retry-after'))
-					console.log('rate limited, retrying after', retryAfter, 'seconds')
+					// console.log('rate limited, retrying after', retryAfter, 'seconds')
 					const retryAfterMs = retryAfter * 1000
 					const timestamp =
 						new Date(response.headers.get('date')!).getTime() + retryAfterMs
