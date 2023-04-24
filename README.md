@@ -1,12 +1,14 @@
 # music-release-notifier
 
+A script that emails you about new releases from Spotify artists you’re interested in.
+
 ## Building
 
 ```sh
 just bundle
 ```
 
-Copy `bundle/music-release-notifier.js` to the NAS.
+The output is `bundle/music-release-notifier.js`.
 
 ## Running
 
