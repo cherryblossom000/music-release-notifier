@@ -16,13 +16,13 @@
 		"allowUnreachableCode": false,
 		"exactOptionalPropertyTypes": true,
 		"forceConsistentCasingInFileNames": true,
-		"importsNotUsedAsValues": "error",
 		"noImplicitOverride": true,
 		"noUncheckedIndexedAccess": true,
 		"noUnusedLocals": true,
+		"strict": true,
 		"noUnusedParameters": true,
 		"useDefineForClassFields": true,
 		"useUnknownInCatchVariables": true,
-		"strict": true
+		"verbatimModuleSyntax": true,
 	}
 }
