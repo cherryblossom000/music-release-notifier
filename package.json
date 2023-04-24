@@ -1,7 +1,11 @@
 {
 	"name": "music-release-notifier",
 	"version": "0.0.1",
-	"author": "cherryblossom (https://github.com/cherryblossom000)",
+	"author": "Lauren Yim (https://github.com/cherryblossom000)",
+	"private": true,
+	"publishConfig": {
+		"access": "restricted"
+	},
 	"license": "MIT",
 	"engines": {
 		"node": ">=18"
