@@ -12,7 +12,7 @@ import 'dotenv/config'
 
 const variousArtistsIds: ReadonlySet<string> = new Set([
 	'0LyfQWJT6nXafLPZqxe9Of', // Various Artists
-	'0wzdbYD0TtDPvbjQ5QT7nY' // ァリアス・アーティスト
+	'0wzdbYD0TtDPvbjQ5QT7nY', // ァリアス・アーティスト
 ])
 const isSoundtrack = (name: string): boolean =>
 	name.includes('soundtrack') || name.includes('motion picture')
@@ -57,7 +57,7 @@ console.log('Now:', newLastCheckedDate)
 const timezoneOffset = new Date('2023').getTimezoneOffset()
 console.log('Timezone offset:', timezoneOffset)
 newLastCheckedDate.setMinutes(
-	newLastCheckedDate.getMinutes() + timezoneOffset - 12 * 60
+	newLastCheckedDate.getMinutes() + timezoneOffset - 12 * 60,
 )
 console.log('New last checked:', newLastCheckedDate)
 const newLastChecked = newLastCheckedDate.getTime()
@@ -69,32 +69,32 @@ else {
 	const {
 		email,
 		country = 'AU',
-		artists: subscribedArtists
+		artists: subscribedArtists,
 	} = z
 		.object({
 			email: z.string(),
 			country: z.string().optional(),
-			artists: z.array(z.string().length(22))
+			artists: z.array(z.string().length(22)),
 		})
 		.parse(
 			await yaml.load(
-				await readFile(path.join(configFolder, 'subscriptions.yaml'), 'utf8')
-			)
+				await readFile(path.join(configFolder, 'subscriptions.yaml'), 'utf8'),
+			),
 		)
 
 	const spotify = await Spotify.clientCredentialsClient(
 		process.env.SPOTIFY_CLIENT_ID!,
-		process.env.SPOTIFY_CLIENT_SECRET!
+		process.env.SPOTIFY_CLIENT_SECRET!,
 	)
 
 	const limit = 50
 	const getAllAlbums = async (
 		artistId: string,
-		market: string
+		market: string,
 	): Promise<Spotify.Album[]> => {
 		const {total, items} = await spotify.getArtistAlbums(artistId, {
 			market,
-			limit
+			limit,
 		})
 
 		return total > items.length
@@ -108,11 +108,11 @@ else {
 									await spotify.getArtistAlbums(artistId, {
 										market,
 										limit,
-										offset: 50 * (i + 1)
+										offset: 50 * (i + 1),
 									})
-								).items
-						)
-					))
+								).items,
+						),
+					)),
 			  )
 			: items
 	}
@@ -127,7 +127,7 @@ else {
 					.map(album => ({
 						...album,
 						timestamp:
-							new Date(album.release_date).getTime() + timezoneOffset * 60_000
+							new Date(album.release_date).getTime() + timezoneOffset * 60_000,
 					}))
 					.filter(
 						a =>
@@ -138,16 +138,16 @@ else {
 								a.artists.length === 1 &&
 								variousArtistsIds.has(a.artists[0]!.id) &&
 								!isSoundtrack(a.name.toLowerCase())
-							)
+							),
 					)
 					.sort((a, b) => a.timestamp - b.timestamp)
 					.map(a => ({
 						name: a.name,
 						url: a.external_urls.spotify,
 						releaseDate: a.release_date,
-						artists: a.artists.map(({id, name}) => ({id, name}))
-					}))
-			}))
+						artists: a.artists.map(({id, name}) => ({id, name})),
+					})),
+			})),
 		)
 	).filter(({albums}) => albums.length)
 
@@ -160,11 +160,11 @@ else {
 				host: process.env.SMTP_HOST,
 				port: Number(process.env.SMTP_PORT),
 				secure: true,
-				auth: {user: emailUser, pass: process.env.EMAIL_PASS}
+				auth: {user: emailUser, pass: process.env.EMAIL_PASS},
 			},
 			{
-				from: `New Music Releases <${emailUser}>`
-			}
+				from: `New Music Releases <${emailUser}>`,
+			},
 		)
 		await transporter.verify()
 
@@ -173,10 +173,10 @@ else {
 				newReleases.map(async ({id: artistId, albums}) => {
 					const {
 						name: artistName,
-						external_urls: {spotify: artistURL}
+						external_urls: {spotify: artistURL},
 					} = await spotify.getArtist(artistId)
 					return `<h2><a href="${artistURL}">${escapeHTML(
-						artistName
+						artistName,
 					)}</a></h2><ul>${albums
 						.map(
 							a =>
@@ -184,16 +184,16 @@ else {
 									a.artists.length === 1 && a.artists[0]!.id === artistId
 										? ''
 										: ` by ${a.artists.map(x => escapeHTML(x.name)).join(', ')}`
-								} (${a.releaseDate})</li>`
+								} (${a.releaseDate})</li>`,
 						)
 						.join('')}</ul>`
-				})
+				}),
 			)
 		).join('')
 		await transporter.sendMail({
 			to: `<${email}>`,
 			subject: 'New Music Releases',
-			html
+			html,
 		})
 	}
 }

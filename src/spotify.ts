@@ -29,7 +29,7 @@ const fetch = async (
 	if (!response.ok && response.status !== 429) {
 		throw new Error(
 			`${response.status} (${response.statusText}) when ${message}
-${await response.text()}`
+${await response.text()}`,
 		)
 	}
 	return response
@@ -53,12 +53,12 @@ export interface Album extends WithExternalURLs {
 
 export const clientCredentialsClient = async (
 	clientId: string,
-	clientSecret: string
+	clientSecret: string,
 ): Promise<{
 	getArtist: (artistId: string) => Promise<Artist>
 	getArtistAlbums: (
 		artistId: string,
-		options?: {market?: string; limit?: number; offset?: number}
+		options?: {market?: string; limit?: number; offset?: number},
 	) => Promise<{
 		items: Album[]
 		total: number
@@ -71,12 +71,12 @@ export const clientCredentialsClient = async (
 			method: 'POST',
 			headers: {
 				authorization: `Basic ${Buffer.from(
-					`${clientId}:${clientSecret}`
+					`${clientId}:${clientSecret}`,
 				).toString('base64')}`,
-				'content-type': 'application/x-www-form-urlencoded'
+				'content-type': 'application/x-www-form-urlencoded',
 			},
-			body: 'grant_type=client_credentials'
-		}
+			body: 'grant_type=client_credentials',
+		},
 	)
 		.then(async r => r.json())
 		.then(b => (b as {access_token: string}).access_token)
@@ -96,8 +96,8 @@ export const clientCredentialsClient = async (
 					message,
 					`https://api.spotify.com/v1/${path}`,
 					{
-						headers: {authorization: `Bearer ${token}`}
-					}
+						headers: {authorization: `Bearer ${token}`},
+					},
 				)
 				if (response.status === 429) {
 					const retryAfter = Number(response.headers.get('retry-after'))
@@ -122,7 +122,7 @@ export const clientCredentialsClient = async (
 				`fetching albums from artist ${artistId}`,
 				`artists/${artistId}/albums?${Object.entries(options)
 					.map(([key, value]) => `${key}=${value}`)
-					.join('&')}`
-			)
+					.join('&')}`,
+			),
 	}
 }
