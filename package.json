@@ -25,31 +25,31 @@
 		"lint:dev": "dum lint -- --cache"
 	},
 	"dependencies": {
-		"dotenv": "^16.0.3",
+		"dotenv": "^16.1.4",
 		"escape-html": "^1.0.3",
 		"js-yaml": "^4.1.0",
-		"nodemailer": "^6.9.1",
-		"undici": "^5.22.0",
+		"nodemailer": "^6.9.3",
+		"undici": "^5.22.1",
 		"zod": "^3.21.4"
 	},
 	"devDependencies": {
-		"@cherryblossom/eslint-config": "18.0.2",
+		"@cherryblossom/eslint-config": "19.0.0",
 		"@types/escape-html": "^1.0.2",
-		"@types/eslint": "^8.37.0",
+		"@types/eslint": "^8.40.1",
 		"@types/js-yaml": "^4.0.5",
-		"@types/node": "^18.16.0",
-		"@types/nodemailer": "^6.4.7",
-		"@typescript-eslint/eslint-plugin": "^5.59.0",
-		"@typescript-eslint/parser": "^5.59.0",
-		"esbuild": "^0.15.18",
-		"eslint": "^8.39.0",
+		"@types/node": "^18.16.16",
+		"@types/nodemailer": "^6.4.8",
+		"@typescript-eslint/eslint-plugin": "^5.59.9",
+		"@typescript-eslint/parser": "^5.59.9",
+		"esbuild": "^0.18.0",
+		"eslint": "^8.42.0",
 		"eslint-import-resolver-typescript": "^3.5.5",
 		"eslint-plugin-eslint-comments": "^3.2.0",
 		"eslint-plugin-import": "^2.27.5",
 		"eslint-plugin-node": "^11.1.0",
 		"eslint-plugin-prettier": "^4.2.1",
-		"eslint-plugin-unicorn": "^45.0.2",
+		"eslint-plugin-unicorn": "^47.0.0",
 		"prettier": "^2.8.8",
-		"typescript": "~5.0.4"
+		"typescript": "~5.1.3"
 	}
 }
