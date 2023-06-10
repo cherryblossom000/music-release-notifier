@@ -13,6 +13,7 @@ import 'dotenv/config'
 const variousArtistsIds: ReadonlySet<string> = new Set([
 	'0LyfQWJT6nXafLPZqxe9Of', // Various Artists
 	'0wzdbYD0TtDPvbjQ5QT7nY', // ァリアス・アーティスト
+	'2ZfttAdppjOzEtw1YZw1pZ', // Summer Hits
 ])
 const isSoundtrack = (name: string): boolean =>
 	name.includes('soundtrack') || name.includes('motion picture')
