@@ -123,9 +123,7 @@ else {
 		await Promise.all(
 			subscribedArtists.map(async artistId => ({
 				id: artistId,
-				albums: (
-					await getAllAlbums(artistId, country)
-				)
+				albums: (await getAllAlbums(artistId, country))
 					.map(album => ({
 						...album,
 						timestamp:
